@@ -26,6 +26,7 @@ import java.util.Scanner;
 
 import org.mockito.Mock;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -45,6 +46,12 @@ public class ClientHandlerTest {
     public void setup() {
         initMocks(this);
         underTest = new ClientHandler(socket);
+    }
+
+    @BeforeMethod
+    public void beforeMethod() {
+        CLIENT_NAMES.clear();
+        CLINT_WRITERS.clear();
     }
 
     @Test
