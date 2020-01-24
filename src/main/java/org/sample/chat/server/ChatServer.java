@@ -15,13 +15,13 @@ import java.util.logging.Logger;
 /**
  * Multithread chat server.
  */
-public class ChatServer {
+public final class ChatServer {
     private static final Logger LOGGER = Logger.getLogger(ChatServer.class.getName());
     private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool((Integer) MAX_THREADS.getValue());
 
     private ServerSocket serverSocket;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         new ChatServer().startServer();
     }
 
@@ -51,5 +51,4 @@ public class ChatServer {
         }
 
     }
-
 }

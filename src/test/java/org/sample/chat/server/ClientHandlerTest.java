@@ -96,7 +96,7 @@ public class ClientHandlerTest {
         doNothing().when(out).println(anyString());
 
         // WHEN
-        underTest.notifyClientAlreadyIn(out);
+        underTest.notifyClientAlreadyIn(CLIENT_NAME_ONE, out);
 
         // THEN
         verify(out, times(1)).println(expectedOutMessage);
@@ -108,7 +108,7 @@ public class ClientHandlerTest {
     public Object[][] dataNotifyClientAlreadyInTest() {
         return new Object[][]{
                 {asList(CLIENT_NAME_ONE, CLIENT_NAME_TWO), "{new message} People already in: John,Anna"},
-                {emptyList(), "{new message} No one is online. Please wait for someone to start the conversation."}
+                {emptyList(), "{new message} " + CLIENT_NAME_ONE + " no one is online. Please wait for someone to start the conversation."}
         };
     }
 

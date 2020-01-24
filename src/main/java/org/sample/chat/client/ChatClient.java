@@ -2,6 +2,11 @@ package org.sample.chat.client;
 
 import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.SOUTH;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import static javax.swing.JOptionPane.PLAIN_MESSAGE;
 
 import static org.sample.chat.config.CommandPrefix.MESSAGE;
 import static org.sample.chat.config.CommandPrefix.NICK_NAME_ACCEPTED;
@@ -15,13 +20,12 @@ import static org.sample.chat.config.Settings.TEXT_AREA_COLUMNS;
 import static org.sample.chat.config.Settings.TEXT_AREA_ROWS;
 import static org.sample.chat.config.Settings.TEXT_FIELD_COLUMNS;
 
-import static javax.swing.JOptionPane.PLAIN_MESSAGE;
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -33,6 +37,8 @@ import javax.swing.JTextField;
  * Chat client.
  */
 public class ChatClient {
+    private static final Logger LOGGER = Logger.getLogger(ChatClient.class.getName());
+
     private PrintWriter out;
     private final JFrame frame = new JFrame(CHAT_TITLE.getValue());
     private final JTextField textField = new JTextField((Integer) TEXT_FIELD_COLUMNS.getValue());
@@ -76,22 +82,35 @@ public class ChatClient {
         try (var socket = new Socket((String) HOST.getValue(), (Integer) PORT.getValue()); var in = new Scanner(socket.getInputStream())) {
             out = new PrintWriter(socket.getOutputStream(), true);
             while (in.hasNextLine()) {
-                var line = in.nextLine();
-                if (line.startsWith(NICK_NAME_SUBMIT.getValue())) {
-                    out.println(getName());
-                } else if (line.startsWith(NICK_NAME_ACCEPTED.getValue())) {
-                    textField.setEditable(true);
-                } else if (line.startsWith(MESSAGE.getValue())) {
-                    messageArea.append(line.substring(messagePrefixLength) + "\n");
-                }
+                var userInput = in.nextLine();
+                processUserInput(messagePrefixLength, userInput);
             }
+        } catch (ConnectException e) {
+            LOGGER.log(SEVERE, "Could not connect to the server, it may be stopped or currently unavailable. Error message: {0}", e.getMessage());
         } finally {
+            LOGGER.log(INFO, "The server closed the connection, bye bye.");
             frame.setVisible(false);
             frame.dispose();
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    /**
+     * Process the user input message.
+     * The managed case are: nick name request, nick name accepted, a user message
+     * @param messagePrefixLength the length of the message label prefix
+     * @param userInput the user input
+     */
+    private void processUserInput(final int messagePrefixLength, final String userInput) {
+        if (userInput.startsWith(NICK_NAME_SUBMIT.getValue())) {
+            out.println(getName());
+        } else if (userInput.startsWith(NICK_NAME_ACCEPTED.getValue())) {
+            textField.setEditable(true);
+        } else if (userInput.startsWith(MESSAGE.getValue())) {
+            messageArea.append(userInput.substring(messagePrefixLength) + "\n");
+        }
+    }
+
+    public static void main(final String[] args) throws Exception {
         var client = new ChatClient();
         client.frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         client.frame.setVisible(true);

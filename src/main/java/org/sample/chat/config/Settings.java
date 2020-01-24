@@ -11,8 +11,15 @@ public enum Settings {
     TEXT_AREA_COLUMNS(50),
     TEXT_AREA_ROWS(16);
 
+    /**
+     * The setting value.
+     */
     private final Object value;
 
+    /**
+     * Constructor.
+     * @param value setting value
+     */
     Settings(final Object value) {
         this.value = value;
     }
