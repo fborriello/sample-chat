@@ -1,7 +1,6 @@
 package org.sample.chat.server;
 
 import static java.lang.String.format;
-import static java.lang.String.join;
 import static java.util.logging.Level.SEVERE;
 
 import static org.sample.chat.config.CommandPrefix.MESSAGE;
@@ -25,7 +24,7 @@ import java.util.logging.Logger;
 /**
  * The client handler task.
  */
-class ClientHandler implements Runnable {
+class ClientHandler extends Thread {
     private static final Logger LOGGER = Logger.getLogger(ClientHandler.class.getName());
 
     /**
@@ -123,7 +122,7 @@ class ClientHandler implements Runnable {
      * @param out the new client output.
      */
     protected void notifyClientAlreadyIn(final PrintWriter out) {
-        String message = CLIENT_NAMES.isEmpty() ? NO_ONE_ONLINE.getValue() : format(PEOPLE_ALREADY_IN.getValue(), join(",", CLIENT_NAMES));
+        String message = CLIENT_NAMES.isEmpty() ? NO_ONE_ONLINE.getValue() : format(PEOPLE_ALREADY_IN.getValue(), String.join(",", CLIENT_NAMES));
         out.println(MESSAGE.getValue() + " " + message);
     }
 
